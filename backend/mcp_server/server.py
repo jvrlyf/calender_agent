@@ -1,8 +1,3 @@
-"""
-MCP Server — Google Calendar tools via MCP protocol.
-Runs as subprocess — must handle ALL imports safely.
-"""
-
 from __future__ import annotations
 
 import sys
@@ -12,9 +7,6 @@ import uuid
 import logging
 from datetime import datetime, timedelta
 
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-#  PATH SETUP — Critical for subprocess
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 _this_dir = os.path.dirname(os.path.abspath(__file__))
 _backend_dir = os.path.abspath(os.path.join(_this_dir, ".."))
@@ -24,10 +16,6 @@ for p in [_project_dir, _backend_dir]:
     if p not in sys.path:
         sys.path.insert(0, p)
 
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-#  BASIC LOGGER (works even if utils import fails)
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
 logging.basicConfig(
     level=logging.DEBUG,
     format="[%(asctime)s] %(levelname)-8s %(name)-20s  %(message)s",
@@ -35,10 +23,6 @@ logging.basicConfig(
     stream=sys.stderr,  # MCP uses stdout for protocol, logs go to stderr
 )
 log = logging.getLogger("mcp.server")
-
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-#  LOAD .env MANUALLY (subprocess may not inherit it)
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 try:
     from dotenv import load_dotenv
@@ -76,10 +60,6 @@ SENDER_EMAIL = os.getenv("SENDER_EMAIL", "")
 DEFAULT_TIMEZONE = os.getenv("DEFAULT_TIMEZONE", "")
 
 log.info("MCP Server Config: MOCK=%s, SENDER=%s, TZ=%s", MOCK_CALENDAR, SENDER_EMAIL, DEFAULT_TIMEZONE)
-
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-#  MOCK CALENDAR (always available)
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 
 class MockCalendar:
@@ -120,10 +100,6 @@ class MockCalendar:
         }]
 
 
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-#  REAL CALENDAR (only if MOCK_CALENDAR=false)
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
 _calendar = None
 
 if MOCK_CALENDAR:
@@ -137,10 +113,6 @@ else:
         log.warning("CalendarService failed (%s), falling back to mock", exc)
         _calendar = MockCalendar()
 
-
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-#  MCP SERVER + TOOLS
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 from mcp.server.fastmcp import FastMCP
 
@@ -157,18 +129,7 @@ def create_meeting(
     participants: list[str],
     description: str = "",
 ) -> str:
-    """
-    Create a Google Calendar meeting.
 
-    Args:
-        title: Meeting title
-        date: Date in YYYY-MM-DD
-        start_time: Start time HH:MM (24h)
-        end_time: End time HH:MM (24h)
-        timezone: IANA timezone e.g. Asia/Kolkata
-        participants: List of attendee emails
-        description: Optional description
-    """
     try:
         start_dt = f"{date}T{start_time}:00"
         end_dt = f"{date}T{end_time}:00"
@@ -189,12 +150,7 @@ def create_meeting(
 
 @mcp.tool()
 def list_meetings(max_results: int = 10) -> str:
-    """
-    List upcoming Google Calendar meetings.
 
-    Args:
-        max_results: Maximum number of events to return
-    """
     try:
         events = _calendar.list_events(max_results=max_results)
         return json.dumps(events)
@@ -204,15 +160,7 @@ def list_meetings(max_results: int = 10) -> str:
 
 @mcp.tool()
 def check_availability(date: str, start_time: str, end_time: str, timezone: str) -> str:
-    """
-    Check if a time slot is available.
 
-    Args:
-        date: YYYY-MM-DD
-        start_time: HH:MM
-        end_time: HH:MM
-        timezone: IANA timezone
-    """
     try:
         events = _calendar.list_events(max_results=50)
         target_start = f"{date}T{start_time}:00"
@@ -228,10 +176,6 @@ def check_availability(date: str, start_time: str, end_time: str, timezone: str)
     except Exception as exc:
         return json.dumps({"error": str(exc)})
 
-
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-#  ENTRY POINT
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 if __name__ == "__main__":
     log.info("🚀 MCP Calendar Server starting (stdio transport)")

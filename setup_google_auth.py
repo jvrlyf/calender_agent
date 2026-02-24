@@ -1,21 +1,11 @@
-"""
-One-time Google OAuth setup script.
-Run this to authenticate with Google Calendar and generate token.json.
-
-Usage:
-    python setup_google_auth.py
-"""
-
 import os
 import sys
 from pathlib import Path
 
-# Fix Windows console encoding
 if sys.platform == "win32":
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 
-# Ensure project root is on path
 project_dir = Path(__file__).resolve().parent
 sys.path.insert(0, str(project_dir))
 

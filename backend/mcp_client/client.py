@@ -16,7 +16,7 @@ log = get_logger("mcp.client")
 
 
 class MCPCalendarClient:
-    """Persistent MCP client that keeps the server subprocess alive."""
+
 
     def __init__(self):
         self._session: ClientSession | None = None
@@ -25,7 +25,6 @@ class MCPCalendarClient:
 
     # ── lifecycle ─────────────────────────────────────
     async def connect(self) -> None:
-        """Start MCP server subprocess and establish session."""
         if self._connected:
             log.warning("MCP client already connected")
             return
@@ -82,7 +81,6 @@ class MCPCalendarClient:
             raise
 
     async def disconnect(self) -> None:
-        """Cleanly shut down the MCP session and server subprocess."""
         if self._stack:
             try:
                 await self._stack.__aexit__(None, None, None)
@@ -94,14 +92,11 @@ class MCPCalendarClient:
             log.info("MCP client disconnected")
 
     async def _reconnect(self) -> None:
-        """Attempt to reconnect if connection was lost."""
         log.warning("Attempting MCP reconnection...")
         await self.disconnect()
         await self.connect()
 
-    # ── tool calls ────────────────────────────────────
     async def call_tool(self, tool_name: str, arguments: dict[str, Any]) -> dict:
-        """Call an MCP tool. Auto-reconnects once on failure."""
         if not self._connected or self._session is None:
             try:
                 await self.connect()

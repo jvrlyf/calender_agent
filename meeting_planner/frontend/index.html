@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Meeting Planner</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <div class="app-wrapper">
+
+    <!-- header -->
+    <header class="glass-header">
+      <div class="logo">🗓️</div>
+      <div>
+        <h1>Meeting Planner</h1>
+        <p class="subtitle">Schedule Google Calendar meetings via chat</p>
+      </div>
+    </header>
+
+    <!-- chat container -->
+    <main class="chat-container glass-panel" id="chatContainer">
+      <div class="messages" id="messages">
+        <!-- welcome message -->
+        <div class="message assistant">
+            <div class="bubble">
+            👋 Hey! I'm your Meeting Planner assistant.<br><br>
+            Just tell me naturally — like:<br>
+            <em>"Ek interview rakho kal 3 baje, mail: raj@gmail.com"</em><br>
+            <em>"Schedule meeting with priya@company.com tomorrow 4 PM — project review"</em><br><br>
+            I'll handle the rest! 🗓️
+            </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- input bar -->
+    <div class="input-bar glass-panel">
+      <input
+        type="text"
+        id="userInput"
+        placeholder="Type your message…"
+        autocomplete="off"
+      />
+      <button id="sendBtn" onclick="sendMessage()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="22" y1="2" x2="11" y2="13"></line>
+          <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+        </svg>
+      </button>
+    </div>
+
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

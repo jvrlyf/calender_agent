@@ -17,13 +17,30 @@ const sessionId = getSessionId();
 
 // ── DOM refs ────────────────────────────────────────
 const messagesEl = document.getElementById("messages");
-const inputEl    = document.getElementById("userInput");
-const sendBtn    = document.getElementById("sendBtn");
+const inputEl = document.getElementById("userInput");
+const sendBtn = document.getElementById("sendBtn");
 
 // ── helpers ─────────────────────────────────────────
 function scrollToBottom() {
   const container = document.getElementById("chatContainer");
   container.scrollTop = container.scrollHeight;
+}
+
+function escapeHTML(str) {
+  return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+function parseMarkdown(text) {
+  let html = escapeHTML(text);
+  // Bold
+  html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+  // Italic
+  html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
+  // Lists
+  html = html.replace(/^(?:-|\*)\s+(.*)$/gm, '&bull; $1');
+  // Newlines
+  html = html.replace(/\n/g, '<br>');
+  return html;
 }
 
 function addMessage(role, text) {
@@ -32,7 +49,12 @@ function addMessage(role, text) {
 
   const bubble = document.createElement("div");
   bubble.className = "bubble";
-  bubble.textContent = text;
+
+  if (role === "user") {
+    bubble.textContent = text;
+  } else {
+    bubble.innerHTML = parseMarkdown(text);
+  }
 
   div.appendChild(bubble);
   messagesEl.appendChild(div);
